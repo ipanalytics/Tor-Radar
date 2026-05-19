@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tor Radar</title>
+    <link rel="stylesheet" href="assets/styles.css?v=2.0">
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Hourly relay intelligence</p>
+        <h1>Tor Radar</h1>
+      </div>
+      <div class="status">
+        <span id="status-dot"></span>
+        <span id="generated-at">Loading</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <h2>Live structure of the public Tor relay network</h2>
+          <p>Relays, exits, guards, hosting concentration, churn, and bandwidth shifts from hourly public snapshots.</p>
+        </div>
+        <div class="orbital" aria-hidden="true">
+          <div class="ring ring-one"></div>
+          <div class="ring ring-two"></div>
+          <div class="node node-a"></div>
+          <div class="node node-b"></div>
+          <div class="node node-c"></div>
+          <div class="node node-d"></div>
+        </div>
+      </section>
+
+      <section class="control-strip">
+        <label>
+          Role
+          <select id="global-role">
+            <option value="all">All relays</option>
+            <option value="guard">Guards</option>
+            <option value="middle">Middle</option>
+            <option value="exit">Exits</option>
+          </select>
+        </label>
+        <label>
+          Country
+          <select id="country-filter">
+            <option value="all">All countries</option>
+          </select>
+        </label>
+        <label>
+          ASN
+          <select id="asn-filter">
+            <option value="all">All ASNs</option>
+          </select>
+        </label>
+        <label>
+          Map metric
+          <select id="map-metric">
+            <option value="relays">Relays</option>
+            <option value="bandwidth">Bandwidth</option>
+            <option value="exits">Exits</option>
+            <option value="guards">Guards</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="metrics" id="metrics"></section>
+
+      <section class="grid-two">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Relay Map</h3>
+            <span id="map-note" class="note"></span>
+          </div>
+          <div id="map"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Snapshot Composition</h3>
+          </div>
+          <canvas id="composition" height="220"></canvas>
+          <div id="insights" class="insights compact"></div>
+        </div>
+      </section>
+
+      <section class="grid-two">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Top ASNs By Bandwidth</h3>
+          </div>
+          <div id="asn-bars" class="bars"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Top Countries By Relays</h3>
+          </div>
+          <div id="country-bars" class="bars"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head explorer-head">
+          <h3>Relay Explorer</h3>
+          <div class="controls">
+            <input id="search" type="search" placeholder="Search ASN, country, nickname, fingerprint">
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Relay</th>
+                <th>Role</th>
+                <th>Country</th>
+                <th>ASN</th>
+                <th>Bandwidth</th>
+                <th>Flags</th>
+              </tr>
+            </thead>
+            <tbody id="relay-table"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+    <script src="assets/app.js?v=2.0"></script>
+  </body>
+</html>
