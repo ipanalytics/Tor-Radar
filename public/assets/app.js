@@ -1,12 +1,29 @@
 const dataBase = location.pathname.includes("/public/") ? "../data" : "data";
 const networkUrl = `${dataBase}/current/network.json`;
 const historyUrl = `${dataBase}/history/summary.csv`;
-
+ 
 let network = null;
 let history = [];
 let filteredRelays = [];
-
+ 
 const number = new Intl.NumberFormat("en-US");
+ 
+// Editorial palette — keep in sync with styles.css :root
+const palette = {
+  ink: "#14110c",
+  inkSoft: "#2a2620",
+  muted: "#756e5c",
+  paper: "#faf6ec",
+  paper2: "#f2ecdc",
+  paper3: "#e6dfcb",
+  line: "#d6cdb5",
+  navy: "#1f3553",
+  navyLight: "#9eb1c9",
+  terra: "#b8542a",
+  gold: "#a07a2a",
+  burgundy: "#842839",
+};
+ 
 const countryCenters = {
   AL: { lat: 41, lon: 20, scale: 5.5 }, AT: { lat: 47.6, lon: 14.3, scale: 5.5 },
   AU: { lat: -25, lon: 134, scale: 2.2 }, BE: { lat: 50.7, lon: 4.6, scale: 6 },
@@ -27,11 +44,11 @@ const countryCenters = {
   SE: { lat: 62, lon: 15, scale: 3.6 }, UA: { lat: 49, lon: 31, scale: 4 },
   US: { lat: 39, lon: -98, scale: 2.4 },
 };
-
+ 
 function fmt(value) {
   return number.format(value || 0);
 }
-
+ 
 function fmtBandwidth(value) {
   const units = ["B/s", "KB/s", "MB/s", "GB/s", "TB/s"];
   let n = Number(value || 0);
@@ -42,7 +59,7 @@ function fmtBandwidth(value) {
   }
   return `${n.toFixed(idx ? 1 : 0)} ${units[idx]}`;
 }
-
+ 
 function parseCsv(text) {
   const lines = text.trim().split(/\r?\n/);
   if (lines.length < 2) return [];
@@ -52,7 +69,7 @@ function parseCsv(text) {
     return Object.fromEntries(headers.map((key, index) => [key, cells[index] ?? ""]));
   });
 }
-
+ 
 async function load() {
   const [networkResponse, historyResponse] = await Promise.all([
     fetch(networkUrl, { cache: "no-store" }),
@@ -63,7 +80,7 @@ async function load() {
   populateFilters();
   render();
 }
-
+ 
 function populateFilters() {
   const countries = [...new Map(network.relays.map((r) => [r.country, r.countryName])).entries()]
     .sort((a, b) => a[0].localeCompare(b[0]));
@@ -72,7 +89,7 @@ function populateFilters() {
   fillSelect("country-filter", countries, ([code, name]) => [code, `${code} ${shorten(name, 22)}`]);
   fillSelect("asn-filter", asns.slice(0, 800), ([asn, name]) => [asn, `${asn} ${shorten(name, 34)}`]);
 }
-
+ 
 function fillSelect(id, rows, mapper) {
   const select = document.getElementById(id);
   const first = select.firstElementChild.outerHTML;
@@ -81,7 +98,7 @@ function fillSelect(id, rows, mapper) {
     return `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`;
   }).join("");
 }
-
+ 
 function currentFilters() {
   return {
     role: document.getElementById("global-role").value,
@@ -91,7 +108,7 @@ function currentFilters() {
     mapMetric: document.getElementById("map-metric").value,
   };
 }
-
+ 
 function applyFilters(includeQuery = true) {
   const filters = currentFilters();
   return network.relays
@@ -111,7 +128,7 @@ function applyFilters(includeQuery = true) {
       ].join(" ").toLowerCase().includes(filters.query);
     });
 }
-
+ 
 function render() {
   filteredRelays = applyFilters();
   document.getElementById("generated-at").textContent = `Updated ${network.generatedAt}`;
@@ -123,7 +140,7 @@ function render() {
   renderComposition();
   renderTable();
 }
-
+ 
 function renderMetrics() {
   const roleCounts = countBy(filteredRelays, "role");
   const countries = new Set(filteredRelays.map((r) => r.country));
@@ -141,7 +158,7 @@ function renderMetrics() {
     .map(([label, value]) => `<div class="metric"><span>${label}</span><strong>${value}</strong></div>`)
     .join("");
 }
-
+ 
 function renderInsights() {
   const rows = [...network.insights];
   document.getElementById("insights").innerHTML = rows.slice(0, 4)
@@ -154,7 +171,7 @@ function renderInsights() {
     `)
     .join("");
 }
-
+ 
 function aggregate(rows, key, mode) {
   const map = new Map();
   for (const row of rows) {
@@ -175,14 +192,14 @@ function aggregate(rows, key, mode) {
   }
   return [...map.values()].sort((a, b) => b[mode] - a[mode]).slice(0, 20);
 }
-
+ 
 function countBy(rows, key) {
   return rows.reduce((acc, row) => {
     acc[row[key]] = (acc[row[key]] || 0) + 1;
     return acc;
   }, {});
 }
-
+ 
 function renderBars(id, rows, valueKey, targetSelect) {
   const max = Math.max(...rows.map((row) => Number(row[valueKey] || 0)), 1);
   document.getElementById(id).innerHTML = rows.slice(0, 12).map((row) => {
@@ -202,7 +219,7 @@ function renderBars(id, rows, valueKey, targetSelect) {
     });
   });
 }
-
+ 
 function renderMap() {
   const metric = currentFilters().mapMetric;
   const rows = aggregate(filteredRelays, "country", metric).filter((row) => /^[A-Z]{2}$/.test(row.key));
@@ -223,29 +240,37 @@ function renderMap() {
     z: values,
     text: labels,
     hovertemplate: "%{text}<extra></extra>",
+    // monochrome navy ramp — premium editorial feel
     colorscale: [
-      [0, "#e9f2ec"],
-      [0.45, "#87cfa8"],
-      [1, "#20865a"],
+      [0,    "#f2ecdc"],   // paper-2
+      [0.25, "#cdd5e0"],
+      [0.55, "#6f87a8"],
+      [1,    palette.navy],
     ],
-    marker: { line: { color: "#ffffff", width: 0.5 } },
-    colorbar: { thickness: 12, outlinewidth: 0 },
+    marker: { line: { color: palette.paper, width: 0.6 } },
+    colorbar: {
+      thickness: 10,
+      outlinewidth: 0,
+      tickfont: { family: "JetBrains Mono, monospace", size: 10, color: palette.muted },
+      bgcolor: "rgba(0,0,0,0)",
+    },
   }], {
     margin: { l: 0, r: 0, t: 0, b: 0 },
     paper_bgcolor: "rgba(0,0,0,0)",
     plot_bgcolor: "rgba(0,0,0,0)",
+    font: { family: "Inter Tight, sans-serif", color: palette.ink },
     geo: {
       projection: { type: "natural earth" },
       ...selectedCountryGeo(),
       showframe: false,
       showcoastlines: true,
-      coastlinecolor: "#b8c8be",
+      coastlinecolor: "#c8bf9f",
       showcountries: true,
-      countrycolor: "#ffffff",
+      countrycolor: palette.paper,
       showland: true,
-      landcolor: "#eef4ef",
+      landcolor: "#e6dfcb",
       showocean: true,
-      oceancolor: "#f8fbf9",
+      oceancolor: "#faf6ec",
       bgcolor: "rgba(0,0,0,0)",
     },
   }, {
@@ -253,7 +278,7 @@ function renderMap() {
     responsive: true,
   });
 }
-
+ 
 function selectedCountryGeo() {
   const country = currentFilters().country;
   if (country === "all") {
@@ -269,7 +294,7 @@ function selectedCountryGeo() {
     projection: { type: "natural earth", scale: center.scale || 3.2 },
   };
 }
-
+ 
 function renderComposition() {
   const canvas = document.getElementById("composition");
   const ctx = setupCanvas(canvas);
@@ -277,15 +302,17 @@ function renderComposition() {
   ctx.clearRect(0, 0, width, height);
   const counts = countBy(filteredRelays, "role");
   const rows = [
-    ["guard", counts.guard || 0, "#20865a"],
-    ["middle", counts.middle || 0, "#087d8f"],
-    ["exit", counts.exit || 0, "#c83b47"],
+    ["guard",  counts.guard  || 0, palette.navy],
+    ["middle", counts.middle || 0, palette.gold],
+    ["exit",   counts.exit   || 0, palette.burgundy],
   ];
   const total = Math.max(filteredRelays.length, 1);
   let start = -Math.PI / 2;
   const cx = Math.min(width * 0.32, 150);
   const cy = height / 2;
-  const radius = Math.min(height * 0.34, 82);
+  const radius = Math.min(height * 0.36, 86);
+ 
+  // ring chart (donut) — flat slices, thin gaps for editorial feel
   for (const [, value, color] of rows) {
     const angle = (value / total) * Math.PI * 2;
     ctx.beginPath();
@@ -296,25 +323,57 @@ function renderComposition() {
     ctx.fill();
     start += angle;
   }
+  // inner cut — paper colour to make a donut
   ctx.beginPath();
-  ctx.fillStyle = "#fff";
-  ctx.arc(cx, cy, radius * 0.58, 0, Math.PI * 2);
+  ctx.fillStyle = palette.paper;
+  ctx.arc(cx, cy, radius * 0.62, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = "#17231d";
-  ctx.font = "700 22px system-ui";
+ 
+  // ring outline
+  ctx.beginPath();
+  ctx.strokeStyle = palette.ink;
+  ctx.lineWidth = 1;
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius * 0.62, 0, Math.PI * 2);
+  ctx.stroke();
+ 
+  // centre count
+  ctx.fillStyle = palette.ink;
+  ctx.font = "400 28px Fraunces, 'Times New Roman', serif";
   ctx.textAlign = "center";
-  ctx.fillText(fmt(total), cx, cy + 8);
+  ctx.textBaseline = "alphabetic";
+  ctx.fillText(fmt(total), cx, cy + 4);
+  ctx.fillStyle = palette.muted;
+  ctx.font = "500 9px 'JetBrains Mono', monospace";
+  ctx.fillText("TOTAL RELAYS", cx, cy + 22);
+ 
+  // legend rows
   ctx.textAlign = "left";
+  ctx.textBaseline = "alphabetic";
   rows.forEach(([name, value, color], index) => {
-    const y = 54 + index * 44;
+    const y = 52 + index * 46;
+    // tick mark
     ctx.fillStyle = color;
-    ctx.fillRect(width * 0.55, y - 12, 14, 14);
-    ctx.fillStyle = "#17231d";
-    ctx.font = "700 14px system-ui";
-    ctx.fillText(`${name.toUpperCase()} ${fmt(value)}`, width * 0.55 + 24, y);
+    ctx.fillRect(width * 0.55, y - 12, 3, 14);
+    // label uppercase mono
+    ctx.fillStyle = palette.muted;
+    ctx.font = "500 10px 'JetBrains Mono', monospace";
+    ctx.fillText(name.toUpperCase(), width * 0.55 + 12, y - 2);
+    // value in serif
+    ctx.fillStyle = palette.ink;
+    ctx.font = "400 22px Fraunces, 'Times New Roman', serif";
+    ctx.fillText(fmt(value), width * 0.55 + 12, y + 18);
+    // share %
+    const pct = total ? Math.round((value / total) * 100) : 0;
+    ctx.fillStyle = palette.muted;
+    ctx.font = "500 10px 'JetBrains Mono', monospace";
+    const valueWidth = ctx.measureText(fmt(value)).width;
+    ctx.fillText(`${pct}%`, width * 0.55 + 12 + valueWidth + 8, y + 18);
   });
 }
-
+ 
 function setupCanvas(canvas) {
   const ratio = window.devicePixelRatio || 1;
   const width = canvas.clientWidth || canvas.parentElement.clientWidth;
@@ -325,7 +384,7 @@ function setupCanvas(canvas) {
   ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
   return ctx;
 }
-
+ 
 function renderTable() {
   const rows = filteredRelays.slice(0, 500);
   document.getElementById("relay-table").innerHTML = rows.map((relay) => `
@@ -343,7 +402,7 @@ function renderTable() {
     </tr>
   `).join("");
 }
-
+ 
 function iso2ToIso3(code) {
   const map = {
     AL: "ALB", AT: "AUT", AU: "AUS", BE: "BEL", BG: "BGR", BR: "BRA", CA: "CAN", CH: "CHE",
@@ -357,26 +416,26 @@ function iso2ToIso3(code) {
   };
   return map[code] || code;
 }
-
+ 
 function escapeHtml(value) {
   return String(value || "").replace(/[&<>"']/g, (char) => {
     return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char];
   });
 }
-
+ 
 function shorten(value, max) {
   const text = String(value || "");
   return text.length > max ? `${text.slice(0, max - 1)}...` : text;
 }
-
+ 
 ["global-role", "country-filter", "asn-filter", "map-metric"].forEach((id) => {
   document.getElementById(id).addEventListener("change", render);
 });
 document.getElementById("search").addEventListener("input", render);
 window.addEventListener("resize", render);
-
+ 
 load().catch((error) => {
   document.getElementById("generated-at").textContent = "Failed to load data";
-  document.getElementById("status-dot").style.background = "var(--red)";
+  document.getElementById("status-dot").style.background = "var(--burgundy)";
   console.error(error);
 });
