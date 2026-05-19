@@ -118,7 +118,7 @@ function render() {
   renderMetrics();
   renderInsights();
   renderBars("asn-bars", aggregate(filteredRelays, "asn", "bandwidth"), "bandwidth", "asn-filter");
-  renderBars("country-bars", aggregate(filteredRelays, "country", "count"), "count", "country-filter");
+  renderBars("country-bars", aggregate(filteredRelays, "country", "count"), "count", "country-filter", true);
   renderMap();
   renderComposition();
   renderTable();
@@ -183,14 +183,15 @@ function countBy(rows, key) {
   }, {});
 }
 
-function renderBars(id, rows, valueKey, targetSelect) {
+function renderBars(id, rows, valueKey, targetSelect, showNames = false) {
   const max = Math.max(...rows.map((row) => Number(row[valueKey] || 0)), 1);
   document.getElementById(id).innerHTML = rows.slice(0, 12).map((row) => {
     const value = Number(row[valueKey] || 0);
     const label = valueKey === "bandwidth" ? fmtBandwidth(value) : fmt(value);
+    const name = showNames ? `${row.key} ${shorten(row.label || row.key, 34)}` : row.key;
     return `
       <div class="bar-row" data-target="${targetSelect}" data-value="${escapeHtml(row.key)}">
-        <span><code>${escapeHtml(row.key)}</code> ${label}</span>
+        <span><code>${escapeHtml(name)}</code> ${label}</span>
         <div class="bar-line"><div class="bar-fill" style="width:${(value / max) * 100}%"></div></div>
       </div>
     `;
