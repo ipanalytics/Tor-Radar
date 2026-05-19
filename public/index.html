@@ -3,26 +3,30 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Tor Radar</title>
+    <title>Tor Radar — Relay Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="assets/styles.css">
   </head>
   <body>
     <header class="topbar">
       <div>
-        <p class="eyebrow">Hourly relay intelligence</p>
-        <h1>Tor Radar</h1>
+        <div>
+          <p class="eyebrow">Hourly Relay Intelligence</p>
+          <h1>Tor Radar</h1>
+        </div>
       </div>
       <div class="status">
         <span id="status-dot"></span>
         <span id="generated-at">Loading</span>
       </div>
     </header>
-
+ 
     <main>
       <section class="hero">
         <div class="hero-copy">
-          <h2>Live structure of the public Tor relay network</h2>
-          <p>Relays, exits, guards, hosting concentration, churn, and bandwidth shifts from hourly public snapshots.</p>
+          <h2>The live <em>structure</em> of the public Tor relay network.</h2>
+          <p>Relays, exits, guards, hosting concentration, churn and bandwidth shifts — observed from hourly public snapshots, presented with editorial precision.</p>
         </div>
         <div class="orbital" aria-hidden="true">
           <div class="ring ring-one"></div>
@@ -33,7 +37,7 @@
           <div class="node node-d"></div>
         </div>
       </section>
-
+ 
       <section class="control-strip">
         <label>
           Role
@@ -66,9 +70,9 @@
           </select>
         </label>
       </section>
-
+ 
       <section class="metrics" id="metrics"></section>
-
+ 
       <section class="grid-two">
         <div class="panel">
           <div class="panel-head">
@@ -77,7 +81,7 @@
           </div>
           <div id="map"></div>
         </div>
-
+ 
         <div class="panel">
           <div class="panel-head">
             <h3>Snapshot Composition</h3>
@@ -86,7 +90,7 @@
           <div id="insights" class="insights compact"></div>
         </div>
       </section>
-
+ 
       <section class="grid-two">
         <div class="panel">
           <div class="panel-head">
@@ -101,7 +105,7 @@
           <div id="country-bars" class="bars"></div>
         </div>
       </section>
-
+ 
       <section class="panel">
         <div class="panel-head explorer-head">
           <h3>Relay Explorer</h3>
@@ -126,7 +130,7 @@
         </div>
       </section>
     </main>
-
+ 
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
     <script src="assets/app.js"></script>
   </body>
