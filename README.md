@@ -4,7 +4,7 @@ Static, GitHub-native Tor relay intelligence dashboard.
 
 Live demo: [https://ipanalytics.github.io/Tor-Radar/](https://ipanalytics.github.io/Tor-Radar/)
 
-![Tor Radar dashboard](./Screenshot.png)
+![Tor Radar dashboard](/docs/Screenshot.png)
 
 The project collects public Tor relay data once per hour, stores compact snapshots in
 the repository, and renders an interactive dashboard without a database or backend.
