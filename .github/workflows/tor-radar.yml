@@ -17,26 +17,22 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: tor-radar
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Update Tor data
         env:
           TOR_RADAR_SNAPSHOT_RETENTION: "168"
           TOR_RADAR_HISTORY_RETENTION: "720"
-          TOR_RADAR_DAN_REFRESH_HOURS: "6"
-          TOR_RADAR_USER_AGENT: "TorRadar/0.1 (+${{ github.server_url }}/${{ github.repository }}; GitHub Actions hourly public-data collector)"
+          TOR_RADAR_DAN_REFRESH_HOURS: "12"
+          TOR_RADAR_USER_AGENT: "TorRadar/0.1 (+${{ github.server_url }}/${{ github.repository }}; GitHub Actions public-data collector)"
         run: python3 scripts/update.py
 
       - name: Commit updated data
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Update Tor Radar data"
-          file_pattern: "tor-radar/data"
+          file_pattern: "data"
 
       - name: Build Pages artifact
         run: |
@@ -47,7 +43,7 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: tor-radar/site
+          path: site
 
   deploy:
     needs: update
