@@ -1,5 +1,8 @@
 # Tor Radar
 
+<p align="center">
+  <img src="./docs/banner.png" alt="Tor Radar" width="100%">
+</p>
 
 <p align="center">
   <a href="LICENSE">
