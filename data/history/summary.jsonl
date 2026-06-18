@@ -196,3 +196,4 @@
 {"asns": 1100, "bandwidth": 171704417842, "countries": 84, "danIps": 10541, "danOnlyIps": 19, "exits": 2867, "generatedAt": "2026-06-17T18:36:00Z", "guards": 4527, "ips": 11302, "middles": 3203, "relays": 10597}
 {"asns": 1100, "bandwidth": 171633896947, "countries": 84, "danIps": 10541, "danOnlyIps": 26, "exits": 2861, "generatedAt": "2026-06-17T22:15:20Z", "guards": 4523, "ips": 11302, "middles": 3209, "relays": 10593}
 {"asns": 1100, "bandwidth": 171631085927, "countries": 84, "danIps": 10499, "danOnlyIps": 1, "exits": 2861, "generatedAt": "2026-06-17T23:53:09Z", "guards": 4525, "ips": 11300, "middles": 3206, "relays": 10592}
+{"asns": 1101, "bandwidth": 171548749101, "countries": 84, "danIps": 10499, "danOnlyIps": 37, "exits": 2862, "generatedAt": "2026-06-18T05:04:32Z", "guards": 4518, "ips": 11293, "middles": 3206, "relays": 10586}
