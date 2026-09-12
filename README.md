@@ -1,5 +1,7 @@
 # Tor Radar
 
+_Русская версия: [README.ru.md](README.ru.md)_
+
 <p align="center">
   <img src="./docs/banner.png" alt="Tor Radar" width="100%">
 </p>
